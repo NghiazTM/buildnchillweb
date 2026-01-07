@@ -195,9 +195,6 @@ const Shop = () => {
           type: 'success', 
           text: 'Đơn hàng đã được tạo! Vui lòng thanh toán để nhận sản phẩm.' 
         });
-        
-        // Gửi thông báo có đơn hàng mới (không await để tránh delay UI)
-        sendDiscordNotification(data, 'ĐƠN HÀNG MỚI');
       }
     } catch (error) {
       console.error('Unexpected error:', error);
