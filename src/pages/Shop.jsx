@@ -30,18 +30,21 @@ const Shop = () => {
   const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1458351729023254529/TldcZM4HKMyELK9ZICAO8WXQDcG6vqCtYeSXJZ7NqXRWf1fZP_MRAjfjfkx-qgOrLJgS'; // Thay bằng URL thật của bạn
 
   const sendDiscordNotification = async (order, customTitle) => {
+    if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.includes('Thay bằng URL thật')) return;
+
     try {
+      const isSuccess = customTitle === 'THANH TOÁN THÀNH CÔNG';
       const embed = {
-        title: `🛒 ${customTitle || 'THÔNG BÁO ĐƠN HÀNG'}`,
-        description: `🔔 <@&1325350965709930548> ${customTitle === 'THANH TOÁN THÀNH CÔNG' ? 'Người chơi đã xác nhận thanh toán!' : 'Có một đơn hàng mới vừa được khởi tạo!'}`,
-        color: customTitle === 'THANH TOÁN THÀNH CÔNG' ? 0x22c55e : 0xffd700,
+        title: `🛒 ${customTitle || 'ĐƠN HÀNG MỚI'}`,
+        description: `🔔 <@741299302495813662> ${isSuccess ? 'Người chơi đã xác nhận đã thanh toán xong! Admin vui lòng kiểm tra ngân hàng.' : 'Có một đơn hàng mới vừa được khởi tạo trên hệ thống!'}`,
+        color: isSuccess ? 2278750 : 16766720, // 0x22c55e (Green) or 0xffd700 (Gold)
         fields: [
-          { name: '👤 Người chơi', value: order.mc_username, inline: true },
-          { name: '📦 Sản phẩm', value: order.product, inline: true },
-          { name: '💰 Giá tiền', value: `${order.price?.toLocaleString('vi-VN')} VNĐ`, inline: true },
+          { name: '👤 Người chơi', value: order.mc_username || 'Không rõ', inline: true },
+          { name: '📦 Sản phẩm', value: order.product || 'Không rõ', inline: true },
+          { name: '💰 Giá tiền', value: `${Number(order.price || 0).toLocaleString('vi-VN')} VNĐ`, inline: true },
           { name: '💳 Thanh toán', value: order.payment_method === 'qr' ? 'QR Code' : 'Chuyển Khoản', inline: true },
-          { name: '🆔 Mã đơn hàng', value: `\`${order.id}\`` },
-          { name: '📜 Lệnh thực thi', value: `\`${order.command}\`` }
+          { name: '🆔 Mã đơn hàng', value: `\`${order.id || 'N/A'}\`` },
+          { name: '📜 Lệnh thực thi', value: `\`${order.command || 'N/A'}\`` }
         ],
         footer: { text: 'BuildnChill Shop System' },
         timestamp: new Date().toISOString()
@@ -51,7 +54,7 @@ const Shop = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content: '🔔 **@admin** Có đơn hàng mới cần xác nhận thanh toán!',
+          content: `🔔 <@741299302495813662> **${isSuccess ? 'XÁC NHẬN THANH TOÁN' : 'ĐƠN HÀNG MỚI'}**`,
           embeds: [embed]
         })
       });
@@ -192,6 +195,9 @@ const Shop = () => {
           type: 'success', 
           text: 'Đơn hàng đã được tạo! Vui lòng thanh toán để nhận sản phẩm.' 
         });
+        
+        // Gửi thông báo có đơn hàng mới (không await để tránh delay UI)
+        sendDiscordNotification(data, 'ĐƠN HÀNG MỚI');
       }
     } catch (error) {
       console.error('Unexpected error:', error);
@@ -206,7 +212,20 @@ const Shop = () => {
 
   const handlePaymentComplete = async () => {
     if (currentOrder) {
-      sendDiscordNotification(currentOrder, 'THANH TOÁN THÀNH CÔNG');
+      // Gửi thông báo cho admin
+      await sendDiscordNotification(currentOrder, 'THANH TOÁN THÀNH CÔNG');
+      
+      // Cập nhật ghi chú trong database để admin biết người chơi đã xác nhận
+      try {
+        await supabase
+          .from('orders')
+          .update({ 
+            notes: 'Người chơi đã bấm nút "Đã Thanh Toán" trên web'
+          })
+          .eq('id', currentOrder.id);
+      } catch (err) {
+        console.error('Error updating order notes:', err);
+      }
     }
     setShowPayment(false);
     setShowSuccess(true);
