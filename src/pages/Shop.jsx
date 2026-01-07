@@ -104,12 +104,12 @@ const Shop = () => {
   };
 
   const loadPaymentInfo = async () => {
-    // Load từ settings hoặc hardcode (có thể lưu trong siteSettings)
+    // Cập nhật thông tin ngân hàng MBBank
     setPaymentInfo({
-      qr_code: 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=BankTransfer',
-      bank_account: '1234567890',
-      bank_name: 'Vietcombank',
-      account_name: 'BUILDNCHILL SHOP'
+      qr_code: '', // Sẽ được tạo động trong modal
+      bank_account: '0379981206',
+      bank_name: 'MBBank',
+      account_name: 'LE DUC TRONG'
     });
   };
 
@@ -313,8 +313,13 @@ const Shop = () => {
                     <div className="text-center mb-3">
                       <p className="mb-2">Quét mã QR để thanh toán:</p>
                       <div className="d-flex justify-content-center mb-3">
-                        <QRCodeCanvas value={paymentInfo.qr_code} size={200} />
+                        <img 
+                          src={`https://img.vietqr.io/image/MB-${paymentInfo.bank_account}-compact2.png?amount=${currentOrder.price}&addInfo=${currentOrder.id.substring(0, 8)}&accountName=${paymentInfo.account_name}`}
+                          alt="VietQR Payment"
+                          style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        />
                       </div>
+                      <p className="small text-muted">Tự động điền số tiền và nội dung chuyển khoản</p>
                     </div>
                   ) : (
                     <div className="mb-3">
