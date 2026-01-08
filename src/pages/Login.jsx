@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useData } from '../context/DataContext';
 import { BiShield, BiUser, BiLock } from 'react-icons/bi';
+import '../styles/winter-theme.css';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -36,14 +37,9 @@ const Login = () => {
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ repeat: Infinity, duration: 2 }}
                 >
-                  <BiShield size={60} style={{ color: '#d97706' }} />
+                  <BiShield size={60} style={{ color: 'var(--winter-blue)' }} />
                 </motion.div>
-                <h2 className="mt-3" style={{ 
-                  background: 'linear-gradient(135deg, #dc2626 0%, #fbbf24 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  fontWeight: 800 
-                }}>
+                <h2 className="mt-3 winter-title">
                   Đăng Nhập Quản Trị
                 </h2>
               </div>
@@ -64,7 +60,7 @@ const Login = () => {
               )}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Tên Đăng Nhập</label>
+                  <label className="form-label">Tên Đăng Nhập</label>
                   <div className="position-relative">
                     <BiUser 
                       size={20} 
@@ -73,7 +69,7 @@ const Login = () => {
                         left: '12px', 
                         top: '50%', 
                         transform: 'translateY(-50%)',
-                        color: '#d97706'
+                        color: 'var(--winter-blue)'
                       }} 
                     />
                     <input
@@ -87,7 +83,7 @@ const Login = () => {
                   </div>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Mật Khẩu</label>
+                  <label className="form-label">Mật Khẩu</label>
                   <div className="position-relative">
                     <BiLock 
                       size={20} 
@@ -96,7 +92,7 @@ const Login = () => {
                         left: '12px', 
                         top: '50%', 
                         transform: 'translateY(-50%)',
-                        color: '#d97706'
+                        color: 'var(--winter-blue)'
                       }} 
                     />
                     <input
@@ -111,7 +107,7 @@ const Login = () => {
                 </div>
                 <motion.button
                   type="submit"
-                  className="tet-button w-100"
+                  className="winter-button w-100"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >

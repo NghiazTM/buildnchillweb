@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BiShoppingBag, BiUser, BiCheckCircle, BiXCircle, BiGift, BiQrScan, BiCreditCard, BiStar } from 'react-icons/bi';
 import { supabase } from '../supabaseClient';
@@ -11,6 +11,7 @@ const Shop = () => {
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const formRef = useRef(null);
   const [formData, setFormData] = useState({
     mc_username: '',
     product_id: '',
@@ -30,14 +31,14 @@ const Shop = () => {
   const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1458351729023254529/TldcZM4HKMyELK9ZICAO8WXQDcG6vqCtYeSXJZ7NqXRWf1fZP_MRAjfjfkx-qgOrLJgS'; // Thay bằng URL thật của bạn
 
   const sendDiscordNotification = async (order, customTitle) => {
-    if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.includes('Thay bằng URL thật')) return;
+    if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.includes('Thay bằng URL thật')) return null;
 
     try {
       const isSuccess = customTitle === 'THANH TOÁN THÀNH CÔNG';
       const embed = {
         title: `🛒 ${customTitle || 'ĐƠN HÀNG MỚI'}`,
         description: `🔔 <@741299302495813662> ${isSuccess ? 'Người chơi đã xác nhận đã thanh toán xong! Admin vui lòng kiểm tra ngân hàng.' : 'Có một đơn hàng mới vừa được khởi tạo trên hệ thống!'}`,
-        color: isSuccess ? 2278750 : 16766720, // 0x22c55e (Green) or 0xffd700 (Gold)
+        color: 16766720, // Luôn để màu Vàng (Gold) khi khách mới đặt/thanh toán
         fields: [
           { name: '👤 Người chơi', value: order.mc_username || 'Không rõ', inline: true },
           { name: '📦 Sản phẩm', value: order.product || 'Không rõ', inline: true },
@@ -50,7 +51,7 @@ const Shop = () => {
         timestamp: new Date().toISOString()
       };
 
-      await fetch(DISCORD_WEBHOOK_URL, {
+      const response = await fetch(`${DISCORD_WEBHOOK_URL}?wait=true`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -58,8 +59,15 @@ const Shop = () => {
           embeds: [embed]
         })
       });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.id;
+      }
+      return null;
     } catch (error) {
       console.error('Error sending Discord notification:', error);
+      return null;
     }
   };
 
@@ -80,9 +88,6 @@ const Shop = () => {
       
       if (error) throw error;
       setCategories(data || []);
-      if (data && data.length > 0) {
-        setSelectedCategory(data[0].id);
-      }
     } catch (error) {
       console.error('Error loading categories:', error);
     }
@@ -126,6 +131,11 @@ const Shop = () => {
   const handleProductSelect = (product) => {
     setSelectedProduct(product);
     setFormData({ ...formData, product_id: product.id });
+    
+    // Tự động cuộn xuống phần điền thông tin
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleChange = (e) => {
@@ -209,15 +219,15 @@ const Shop = () => {
 
   const handlePaymentComplete = async () => {
     if (currentOrder) {
-      // Gửi thông báo cho admin
-      await sendDiscordNotification(currentOrder, 'THANH TOÁN THÀNH CÔNG');
+      // Gửi thông báo cho admin và lấy message ID
+      const messageId = await sendDiscordNotification(currentOrder, 'THANH TOÁN THÀNH CÔNG');
       
       // Cập nhật ghi chú trong database để admin biết người chơi đã xác nhận
       try {
         await supabase
           .from('orders')
           .update({ 
-            notes: 'Người chơi đã bấm nút "Đã Thanh Toán" trên web'
+            notes: `Người chơi đã bấm nút "Đã Thanh Toán" trên web${messageId ? ` [msg_id:${messageId}]` : ''}`
           })
           .eq('id', currentOrder.id);
       } catch (err) {
@@ -273,7 +283,7 @@ const Shop = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            ❄️ Mua sắm và nhận item ngay trong game! ❄️
+            ❄️ Mua sắm mùa đông, rước lộc đầy kho! ❄️
           </motion.p>
 
           {/* Payment Modal */}
@@ -344,7 +354,7 @@ const Shop = () => {
                       Đã Thanh Toán
                     </motion.button>
                     <motion.button
-                      className="tet-button-outline"
+                      className="winter-button-outline"
                       onClick={() => setShowPayment(false)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -386,7 +396,7 @@ const Shop = () => {
                     <BiCheckCircle size={100} color="#22c55e" className="mb-4" />
                   </motion.div>
                   <h2 className="winter-title mb-3" style={{ fontSize: '2rem' }}>Thanh Toán Thành Công!</h2>
-                  <p className="mb-4" style={{ fontSize: '1.1rem', color: 'var(--winter-text-dark)' }}>
+                  <p className="mb-4" style={{ fontSize: '1.1rem', color: 'var(--winter-text)' }}>
                     Cảm ơn bạn đã mua sắm tại BuildnChill. <br />
                     Vui lòng chờ admin xác nhận thanh toán. Bạn sẽ nhận được sản phẩm trong game ngay sau đó! 🎊
                   </p>
@@ -491,7 +501,7 @@ const Shop = () => {
                           </h5>
                         </div>
                       </div>
-                      <p style={{ color: 'var(--winter-text-light)', marginBottom: '1rem', minHeight: '40px' }}>
+                      <p style={{ color: 'var(--winter-text)', marginBottom: '1rem', minHeight: '40px' }}>
                         {product.description}
                       </p>
                       <div className="d-flex justify-content-between align-items-center">
@@ -506,7 +516,7 @@ const Shop = () => {
 
               {filteredProducts.length === 0 && (
                 <div className="text-center py-5">
-                  <p style={{ color: 'var(--winter-text-light)', fontSize: '1.2rem' }}>
+                  <p style={{ color: 'var(--winter-text)', fontSize: '1.2rem' }}>
                     Không có sản phẩm nào trong danh mục này.
                   </p>
                 </div>
@@ -517,6 +527,7 @@ const Shop = () => {
           {/* Order Form */}
           {selectedProduct && (
             <motion.div 
+              ref={formRef}
               className="mt-5"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -574,7 +585,7 @@ const Shop = () => {
                       <p className="mb-1" style={{ color: 'var(--winter-text)', fontWeight: 600, fontSize: '1.1rem' }}>
                         {selectedProduct.name}
                       </p>
-                      <p className="mb-0" style={{ color: 'var(--winter-text-light)' }}>
+                      <p className="mb-0" style={{ color: 'var(--winter-text)' }}>
                         {selectedProduct.description}
                       </p>
                       <p className="mt-2 mb-0" style={{ color: 'var(--winter-blue-dark)', fontWeight: 700, fontSize: '1.2rem' }}>

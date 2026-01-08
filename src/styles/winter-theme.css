@@ -101,13 +101,14 @@ body {
 }
 
 /* Winter Button */
-.tet-button {
+.winter-button {
   background: var(--winter-gradient-1) !important;
   border: 2px solid rgba(255, 255, 255, 0.5) !important;
   color: var(--winter-white) !important;
-  padding: 12px 28px !important;
+  padding: 10px 20px !important;
   border-radius: 12px !important;
   font-weight: 700 !important;
+  font-family: 'Poppins', sans-serif !important;
   text-transform: uppercase !important;
   letter-spacing: 1.5px !important;
   transition: all 0.3s ease !important;
@@ -115,47 +116,54 @@ body {
   overflow: hidden !important;
   box-shadow: var(--winter-shadow-soft) !important;
   text-decoration: none !important;
-  display: inline-block !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.9rem !important;
 }
 
-.tet-button::before {
+.winter-button::before {
   content: '';
   position: absolute;
   top: 0;
   left: -100%;
-  width: 100%;
+  /* width: 100%; */
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   transition: left 0.5s ease;
 }
 
-.tet-button:hover {
+.winter-button:hover {
   transform: translateY(-3px) !important;
   box-shadow: var(--winter-shadow-strong), 0 0 30px rgba(14, 165, 233, 0.6) !important;
   border-color: var(--winter-white) !important;
 }
 
-.tet-button:hover::before {
+.winter-button:hover::before {
   left: 100%;
 }
 
-.tet-button-outline {
+.winter-button-outline {
   background: transparent !important;
   border: 2px solid var(--winter-blue) !important;
   color: var(--winter-blue) !important;
-  padding: 12px 28px !important;
+  padding: 10px 20px !important;
   border-radius: 12px !important;
   font-weight: 700 !important;
+  font-family: 'Poppins', sans-serif !important;
   text-transform: uppercase !important;
   letter-spacing: 1.5px !important;
   transition: all 0.3s ease !important;
   position: relative !important;
   overflow: hidden !important;
   text-decoration: none !important;
-  display: inline-block !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.9rem !important;
 }
 
-.tet-button-outline:hover {
+.winter-button-outline:hover {
   background: var(--winter-blue) !important;
   color: var(--winter-white) !important;
   transform: translateY(-3px) !important;

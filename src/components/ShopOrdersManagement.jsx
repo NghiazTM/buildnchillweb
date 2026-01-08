@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { BiCheckCircle, BiXCircle, BiShow, BiRefresh } from 'react-icons/bi';
 import { supabase } from '../supabaseClient';
 
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1458351729023254529/TldcZM4HKMyELK9ZICAO8WXQDcG6vqCtYeSXJZ7NqXRWf1fZP_MRAjfjfkx-qgOrLJgS';
+
 const ShopOrdersManagement = () => {
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState('all');
@@ -40,10 +42,54 @@ const ShopOrdersManagement = () => {
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
+      // Fetch fresh order data to ensure we have the latest notes (msg_id)
+      const { data: order, error: fetchError } = await supabase
+        .from('orders')
+        .select('*, products(name, display_price), categories(name)')
+        .eq('id', orderId)
+        .single();
+      
+      if (fetchError || !order) throw new Error('Không tìm thấy đơn hàng trong hệ thống!');
+
       const updateData = { status: newStatus };
-      if (newStatus === 'paid') {
+      
+      if (newStatus === 'paid' && order.command) {
         updateData.paid_at = new Date().toISOString();
+        
+        // Trích xuất message ID từ ghi chú
+        const msgMatch = order.notes?.match(/\[msg_id:(\d+)\]/);
+        const discordMsgId = msgMatch ? msgMatch[1] : null;
+
+        // Gửi lệnh vào hàng chờ cho Plugin
+        const { error: cmdError } = await supabase
+          .from('pending_commands')
+          .insert([
+            {
+              command: order.command,
+              mc_username: order.mc_username,
+              status: 'pending',
+              discord_message_id: discordMsgId
+            }
+          ]);
+        
+        if (cmdError) {
+          console.error('Error queuing Minecraft command:', cmdError);
+        } else {
+          // Gửi thông báo chat game - Định dạng: &8[&d&l🪸&8]&d&l BnC-Shop&8→ &a Giao thành công đơn hàng ......&a Cảm ơn bạn đã ủng hộ!
+          const notifyMsg = `{"text":"","extra":[{"text":"[","color":"dark_gray"},{"text":"\ud83e\udeb8","color":"light_purple","bold":true},{"text":"]","color":"dark_gray"},{"text":" BnC-Shop","color":"light_purple","bold":true},{"text":" \u2192 ","color":"dark_gray"},{"text":"Giao thành công đơn hàng ","color":"green"},{"text":"${order.product || order.products?.name}","color":"aqua"},{"text":". Cảm ơn bạn đã ủng hộ!","color":"green"}]}`;
+          await supabase
+            .from('pending_commands')
+            .insert([
+              {
+                command: `tellraw ${order.mc_username} ${notifyMsg}`,
+                mc_username: order.mc_username,
+                status: 'pending',
+                discord_message_id: discordMsgId
+              }
+            ]);
+        }
       }
+
       if (newStatus === 'delivered') {
         updateData.delivered = true;
       }
@@ -54,6 +100,10 @@ const ShopOrdersManagement = () => {
         .eq('id', orderId);
       
       if (error) throw error;
+      
+      // Sync to Discord using fresh order data
+      await updateDiscordStatus(order, newStatus);
+
       loadOrders();
       if (showModal) setShowModal(false);
     } catch (error) {
@@ -62,7 +112,60 @@ const ShopOrdersManagement = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
+  const updateDiscordStatus = async (order, newStatus) => {
+    const match = order.notes?.match(/\[msg_id:(\d+)\]/);
+    if (!match) {
+      console.log('No Discord message ID found in notes, skipping sync.');
+      return;
+    }
+
+    const messageId = match[1];
+    const statusLabel = newStatus === 'paid' ? 'ĐÃ THANH TOÁN' : 'ĐÃ GIAO HÀNG';
+    const statusColor = newStatus === 'paid' ? 3447003 : 3066993; // Paid: Blue, Delivered: Green
+
+    const embed = {
+      title: `🛒 ${statusLabel}`,
+      description: newStatus === 'paid' 
+        ? `💰 Đơn hàng của **${order.mc_username}** đã được thanh toán thành công và đang chờ giao!`
+        : `✅ Đơn hàng của **${order.mc_username}** đã được giao thành công!`,
+      color: statusColor,
+      fields: [
+        { name: '👤 Người chơi', value: order.mc_username || 'Không rõ', inline: true },
+        { name: '📦 Sản phẩm', value: order.product || order.products?.name || 'Không rõ', inline: true },
+        { name: '💰 Giá tiền', value: `${Number(order.price || 0).toLocaleString('vi-VN')} VNĐ`, inline: true },
+        { name: '🆔 Mã đơn hàng', value: `\`${order.id || 'N/A'}\`` },
+        { name: '✅ Trạng thái hiện tại', value: `**${statusLabel}**` }
+      ],
+      footer: { text: 'BuildnChill Shop System - Status Updated' },
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      console.log(`Updating Discord message ${messageId} to status ${newStatus}...`);
+      const response = await fetch(`${DISCORD_WEBHOOK_URL}/messages/${messageId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] })
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Discord API error:', errorText);
+      } else {
+        console.log('Discord status updated successfully.');
+      }
+    } catch (error) {
+      console.error('Error updating Discord message:', error);
+    }
+  };
+
+  const getStatusBadge = (order) => {
+    const status = order.status;
+    const delivered = order.delivered;
+    
+    if (delivered) {
+      return <span className="badge bg-success">Đã Giao</span>;
+    }
+    
     const badges = {
       pending: { label: 'Chờ Thanh Toán', class: 'bg-danger' },
       paid: { label: 'Đã Thanh Toán', class: 'bg-success' },
@@ -84,7 +187,7 @@ const ShopOrdersManagement = () => {
             <option value="delivered">Đã Giao</option>
           </select>
           <motion.button
-            className="tet-button-outline"
+            className="winter-button-outline"
             onClick={loadOrders}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -114,11 +217,11 @@ const ShopOrdersManagement = () => {
                 <td>{order.mc_username}</td>
                 <td>{order.product || order.products?.name}</td>
                 <td>{order.price?.toLocaleString('vi-VN')} VNĐ</td>
-                <td>{getStatusBadge(order.status)}</td>
+                <td>{getStatusBadge(order)}</td>
                 <td>{new Date(order.created_at).toLocaleString('vi-VN')}</td>
                 <td>
                   <motion.button
-                    className="tet-button-outline me-2"
+                    className="winter-button-outline me-2"
                     onClick={() => handleViewOrder(order)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -127,24 +230,24 @@ const ShopOrdersManagement = () => {
                   </motion.button>
                   {order.status === 'pending' && (
                     <motion.button
-                      className="tet-button-outline"
+                      className="winter-button-outline"
                       onClick={() => handleUpdateStatus(order.id, 'paid')}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       style={{ borderColor: '#22c55e', color: '#22c55e' }}
                     >
-                      <BiCheckCircle /> Xác Nhận
+                      <BiCheckCircle /> Xác Nhận Thanh Toán
                     </motion.button>
                   )}
-                  {order.status === 'paid' && !order.delivered && (
+                  {order.status === 'paid' && (
                     <motion.button
-                      className="tet-button-outline"
+                      className="winter-button-outline"
                       onClick={() => handleUpdateStatus(order.id, 'delivered')}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      style={{ borderColor: '#22c55e', color: '#22c55e' }}
+                      style={{ borderColor: '#0ea5e9', color: '#0ea5e9' }}
                     >
-                      <BiCheckCircle /> Đã Giao
+                      <BiCheckCircle /> Xác Nhận Đã Giao
                     </motion.button>
                   )}
                 </td>
@@ -171,7 +274,7 @@ const ShopOrdersManagement = () => {
               <strong>Giá:</strong> {selectedOrder.price?.toLocaleString('vi-VN')} VNĐ
             </div>
             <div className="mb-3">
-              <strong>Trạng Thái:</strong> {getStatusBadge(selectedOrder.status)}
+              <strong>Trạng Thái:</strong> {getStatusBadge(selectedOrder)}
             </div>
             <div className="mb-3">
               <strong>Phương Thức Thanh Toán:</strong> {selectedOrder.payment_method === 'qr' ? 'QR Code' : 'Chuyển Khoản'}
@@ -201,22 +304,11 @@ const ShopOrdersManagement = () => {
                   whileTap={{ scale: 0.98 }}
                 >
                   <BiCheckCircle className="me-2" />
-                  Xác Nhận Thanh Toán
-                </motion.button>
-              )}
-              {selectedOrder.status === 'paid' && !selectedOrder.delivered && (
-                <motion.button
-                  className="winter-button"
-                  onClick={() => handleUpdateStatus(selectedOrder.id, 'delivered')}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <BiCheckCircle className="me-2" />
-                  Đánh Dấu Đã Giao
+                  Xác Nhận Thanh Toán & Giao Đồ
                 </motion.button>
               )}
               <motion.button
-                className="tet-button-outline"
+                className="winter-button-outline"
                 onClick={() => setShowModal(false)}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}

@@ -124,7 +124,7 @@ const Contact = () => {
           </motion.h1>
           <motion.p 
             className="mb-5 text-center"
-            style={{ color: 'var(--winter-text-light)', fontSize: '1.1rem' }}
+            style={{ color: 'var(--winter-text)', fontSize: '1.1rem' }}
           >
             Have a question or need help? Fill out the form below and we'll get back to you as soon as possible.
           </motion.p>
@@ -241,7 +241,7 @@ const Contact = () => {
               transition={{ delay: 0.8 }}
             >
               <label htmlFor="image" className="form-label">
-                <BiImageAdd className="me-2" style={{ color: '#d97706' }} />
+                <BiImageAdd className="me-2" style={{ color: 'var(--winter-blue)' }} />
                 Tải Ảnh Lên (Tùy chọn)
               </label>
               <input
@@ -269,7 +269,7 @@ const Contact = () => {
                   <motion.button
                     type="button"
                     onClick={handleRemoveImage}
-                    className="btn btn-danger position-absolute"
+                    className="position-absolute"
                     style={{
                       top: '5px',
                       right: '5px',
@@ -279,7 +279,11 @@ const Contact = () => {
                       padding: 0,
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      background: '#ef4444',
+                      border: 'none',
+                      color: 'white',
+                      cursor: 'pointer'
                     }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
@@ -292,7 +296,7 @@ const Contact = () => {
 
             <motion.button 
               type="submit" 
-              className="tet-button w-100"
+              className="winter-button w-100"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               disabled={submitting || uploading}

@@ -182,13 +182,13 @@ const ShopProductsManagement = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1 className="winter-section-title" style={{ margin: 0 }}>Quản Lý Sản Phẩm</h1>
         <motion.button
-          className="tet-button"
+          className="winter-button"
           onClick={handleAddNew}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           <BiPlus className="me-2" />
-          Thêm Sản Phẩm
+          Thêm
         </motion.button>
       </div>
 
@@ -226,7 +226,7 @@ const ShopProductsManagement = () => {
                 </td>
                 <td>
                   <motion.button
-                    className="tet-button-outline me-2"
+                    className="winter-button-outline me-2"
                     onClick={() => handleEdit(product)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -234,7 +234,7 @@ const ShopProductsManagement = () => {
                     <BiEdit />
                   </motion.button>
                   <motion.button
-                    className="tet-button-outline"
+                    className="winter-button-outline"
                     onClick={() => handleDelete(product.id)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -281,7 +281,7 @@ const ShopProductsManagement = () => {
                   )}
                   {imageFile && (
                     <div className="position-relative">
-                      <img src={URL.createObjectURL(imageFile)} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '2px solid var(--winter-lucky-red)' }} />
+                      <img src={URL.createObjectURL(imageFile)} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '2px solid var(--tet-lucky-red)' }} />
                       <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '8px', color: 'white', fontSize: '0.7rem' }}>Mới</div>
                     </div>
                   )}
@@ -326,7 +326,7 @@ const ShopProductsManagement = () => {
                   <BiCheck className="me-2" />
                   {uploading ? 'Đang tải ảnh...' : (editingProduct ? 'Cập Nhật' : 'Thêm Mới')}
                 </motion.button>
-                <motion.button type="button" className="tet-button-outline" onClick={() => setShowModal(false)} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.button type="button" className="winter-button-outline" onClick={() => setShowModal(false)} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <BiX className="me-2" />
                   Hủy
                 </motion.button>

@@ -44,7 +44,7 @@ const NewsDetail = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <Link to="/news" className="tet-button-outline mb-4 d-inline-flex align-items-center">
+          <Link to="/news" className="winter-button-outline mb-4 d-inline-flex align-items-center">
             <BiArrowBack className="me-2" />
             Quay Lại Tin Tức
           </Link>

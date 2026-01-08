@@ -161,10 +161,10 @@
   background: var(--winter-gradient-1);
   border: 2px solid rgba(255, 255, 255, 0.5);
   color: var(--winter-white);
-  padding: 14px 32px;
+  padding: 10px 20px;
   border-radius: 12px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: all 0.3s ease;
@@ -172,8 +172,10 @@
   overflow: hidden;
   box-shadow: var(--winter-shadow-soft);
   cursor: pointer;
-  display: inline-block;
-  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
   text-align: center;
 }
 

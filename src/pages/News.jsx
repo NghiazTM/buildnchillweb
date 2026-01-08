@@ -123,7 +123,7 @@ const News = () => {
                   <p className="card-text news-description-truncate" style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', fontWeight: 500 }}>
                     {featuredPost.description}
                   </p>
-                  <Link to={`/news/${featuredPost.id}`} className="tet-button mt-3">
+                  <Link to={`/news/${featuredPost.id}`} className="winter-button mt-3">
                     Đọc Thêm
                   </Link>
                 </div>
@@ -170,7 +170,7 @@ const News = () => {
                     {post.description}
                   </p>
                   <div className="mt-auto">
-                  <Link to={`/news/${post.id}`} className="tet-button w-100 text-center">
+                  <Link to={`/news/${post.id}`} className="winter-button w-100 text-center">
                     Đọc Thêm
                   </Link>
                   </div>
@@ -189,7 +189,7 @@ const News = () => {
           transition={{ delay: 0.5 }}
         >
           <motion.button 
-            className="tet-button-outline me-3"
+            className="winter-button-outline me-3"
             onClick={handlePrevious}
             disabled={currentPage === 1}
             whileHover={{ scale: currentPage === 1 ? 1 : 1.05 }}
@@ -202,7 +202,7 @@ const News = () => {
             Trang {currentPage} / {totalPages}
           </span>
           <motion.button 
-            className="tet-button-outline"
+            className="winter-button-outline"
             onClick={handleNext}
             disabled={currentPage === totalPages}
             whileHover={{ scale: currentPage === totalPages ? 1 : 1.05 }}

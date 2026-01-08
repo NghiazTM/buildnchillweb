@@ -237,11 +237,12 @@ const Admin = () => {
       <div className="admin-top-nav d-lg-none">
         <div className="admin-top-nav-header">
           <h4 style={{ 
-            background: 'linear-gradient(135deg, #dc2626 0%, #d97706 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            color: 'var(--winter-blue)',
             fontWeight: 800,
-            margin: 0
+            margin: 0,
+            textShadow: '0 0 15px rgba(14, 165, 233, 0.4)',
+            fontSize: '1.3rem',
+            fontFamily: "'Poppins', sans-serif"
           }}>{siteSettings?.site_title || 'BuildnChill'} Admin</h4>
         </div>
         <nav className="admin-top-nav-menu">
@@ -284,7 +285,7 @@ const Admin = () => {
         </nav>
         <div className="admin-top-nav-footer">
           <motion.button
-            className="tet-button w-100"
+            className="winter-button w-100"
             onClick={handleLogout}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -305,11 +306,12 @@ const Admin = () => {
         >
           <div className="p-3 mb-4">
             <h4 style={{ 
-              background: 'linear-gradient(135deg, #dc2626 0%, #d97706 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: 'var(--winter-blue)',
               fontWeight: 800,
-              margin: 0
+              margin: 0,
+              textShadow: '0 0 15px rgba(14, 165, 233, 0.4)',
+              fontSize: '1.2rem',
+              fontFamily: "'Poppins', sans-serif"
             }}>{siteSettings?.site_title || 'BuildnChill'} Admin</h4>
           </div>
           <nav className="nav flex-column">
@@ -352,7 +354,7 @@ const Admin = () => {
           </nav>
           <div className="p-3 mt-auto">
             <motion.button
-              className="tet-button w-100"
+              className="winter-button w-100"
               onClick={handleLogout}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -415,14 +417,14 @@ const Admin = () => {
               <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
                 <h1 className="winter-section-title" style={{ wordWrap: 'break-word', margin: 0 }}>Quản Lý Tin Tức</h1>
                 <motion.button
-                  className="tet-button"
+                  className="winter-button"
                   onClick={handleAddNew}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
                 >
                   <BiPlus className="me-2" />
-                  Thêm Bài Viết Mới
+                  Thêm
                 </motion.button>
               </div>
 
@@ -454,7 +456,7 @@ const Admin = () => {
                           <td style={{ whiteSpace: 'nowrap', color: '#1a1a1a', fontWeight: 500 }}>{new Date(post.date).toLocaleDateString('vi-VN')}</td>
                           <td style={{ whiteSpace: 'nowrap' }}>
                             <motion.button
-                              className="tet-button-outline me-2"
+                              className="winter-button-outline me-2"
                               style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem' }}
                               onClick={() => handleEdit(post)}
                               whileHover={{ scale: 1.05 }}
@@ -464,7 +466,7 @@ const Admin = () => {
                               Sửa
                             </motion.button>
                             <motion.button
-                              className="tet-button-outline"
+                              className="winter-button-outline"
                               style={{ 
                                 padding: '0.25rem 0.75rem', 
                                 fontSize: '0.875rem',
@@ -616,7 +618,7 @@ const Admin = () => {
                             </td>
                             <td style={{ whiteSpace: 'nowrap' }}>
                               <motion.button
-                                className="tet-button-outline me-2 mb-2 mb-md-0"
+                                className="winter-button-outline me-2 mb-2 mb-md-0"
                                 style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', whiteSpace: 'nowrap' }}
                                 onClick={() => {
                                   setSelectedContact(contact);
@@ -632,7 +634,7 @@ const Admin = () => {
                                 Xem
                               </motion.button>
                               <motion.button
-                                className="tet-button-outline"
+                                className="winter-button-outline"
                                 style={{ 
                                   padding: '0.25rem 0.75rem', 
                                   fontSize: '0.875rem',
@@ -722,7 +724,7 @@ const Admin = () => {
                   />
                 </div>
                 <motion.button
-                  className="tet-button"
+                  className="winter-button"
                   onClick={handleServerSave}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -841,7 +843,7 @@ const Admin = () => {
                   />
                 </div>
                 <motion.button
-                  className="tet-button"
+                  className="winter-button"
                   onClick={handleSettingsSave}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -867,8 +869,8 @@ const Admin = () => {
             initial={{ scale: 0.8, y: 50 }}
             animate={{ scale: 1, y: 0 }}
           >
-            <div className="modal-content glass-strong" style={{ border: '2px solid #fbbf24' }}>
-              <div className="modal-header" style={{ borderBottom: '1px solid rgba(251, 191, 36, 0.3)' }}>
+            <div className="modal-content glass-strong" style={{ border: '2px solid var(--winter-blue)' }}>
+              <div className="modal-header" style={{ borderBottom: '1px solid rgba(14, 165, 233, 0.3)' }}>
                 <h5 className="modal-title" style={{ color: 'var(--winter-blue)' }}>
                   {editingPost ? 'Sửa Bài Viết' : 'Thêm Bài Viết Mới'}
                 </h5>
@@ -945,7 +947,7 @@ const Admin = () => {
               <div className="modal-footer" style={{ borderTop: '1px solid rgba(251, 191, 36, 0.3)' }}>
                 <motion.button
                   type="button"
-                  className="tet-button-outline"
+                  className="winter-button-outline"
                   onClick={() => {
                     setShowModal(false);
                     setEditingPost(null);
@@ -958,7 +960,7 @@ const Admin = () => {
                 </motion.button>
                 <motion.button
                   type="button"
-                  className="tet-button"
+                  className="winter-button"
                   onClick={handleSave}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -985,8 +987,8 @@ const Admin = () => {
             initial={{ scale: 0.8, y: 50 }}
             animate={{ scale: 1, y: 0 }}
           >
-            <div className="modal-content glass-strong" style={{ border: '2px solid #d97706' }}>
-              <div className="modal-header" style={{ borderBottom: '1px solid rgba(217, 119, 6, 0.3)' }}>
+            <div className="modal-content glass-strong" style={{ border: '2px solid var(--winter-blue)' }}>
+              <div className="modal-header" style={{ borderBottom: '1px solid rgba(14, 165, 233, 0.3)' }}>
                 <h5 className="modal-title" style={{ color: 'var(--winter-blue-dark)', fontWeight: 800 }}>
                   Chi Tiết Liên Hệ
                 </h5>
@@ -1008,23 +1010,23 @@ const Admin = () => {
                     <p style={{ color: '#1a1a1a', fontWeight: 500, marginTop: '0.5rem' }}>{selectedContact.ign}</p>
                   </div>
                   <div className="col-md-6">
-                    <strong style={{ color: '#d97706', fontSize: '1rem' }}>Email:</strong>
-                    <p style={{ marginTop: '0.5rem' }}><a href={`mailto:${selectedContact.email}`} style={{ color: '#d97706', fontWeight: 500 }}>{selectedContact.email}</a></p>
+                    <strong style={{ color: 'var(--winter-blue)', fontSize: '1rem' }}>Email:</strong>
+                    <p style={{ marginTop: '0.5rem' }}><a href={`mailto:${selectedContact.email}`} style={{ color: 'var(--winter-blue)', fontWeight: 500 }}>{selectedContact.email}</a></p>
                   </div>
                 </div>
                 <div className="row mb-3">
                   <div className="col-md-6">
-                    <strong style={{ color: '#d97706', fontSize: '1rem' }}>Số Điện Thoại:</strong>
+                    <strong style={{ color: 'var(--winter-blue)', fontSize: '1rem' }}>Số Điện Thoại:</strong>
                     <p style={{ color: '#1a1a1a', fontWeight: 500, marginTop: '0.5rem' }}>{selectedContact.phone || '-'}</p>
                   </div>
                   <div className="col-md-6">
-                    <strong style={{ color: '#d97706', fontSize: '1rem' }}>Danh Mục:</strong>
+                    <strong style={{ color: 'var(--winter-blue)', fontSize: '1rem' }}>Danh Mục:</strong>
                     <p style={{ marginTop: '0.5rem' }}>
                       <span style={{ 
                         padding: '0.25rem 0.5rem', 
                         borderRadius: '4px', 
-                        backgroundColor: 'rgba(217, 119, 6, 0.2)',
-                        color: '#d97706',
+                        backgroundColor: 'rgba(14, 165, 233, 0.2)',
+                        color: 'var(--winter-blue)',
                         fontSize: '0.875rem',
                         fontWeight: 600
                       }}>
@@ -1034,16 +1036,16 @@ const Admin = () => {
                   </div>
                 </div>
                 <div className="mb-3">
-                  <strong style={{ color: '#d97706', fontSize: '1rem' }}>Chủ Đề:</strong>
+                  <strong style={{ color: 'var(--winter-blue)', fontSize: '1rem' }}>Chủ Đề:</strong>
                   <p style={{ color: '#1a1a1a', fontWeight: 500, marginTop: '0.5rem' }}>{selectedContact.subject}</p>
                 </div>
                 <div className="mb-3">
-                  <strong style={{ color: '#d97706', fontSize: '1rem' }}>Nội Dung:</strong>
+                  <strong style={{ color: 'var(--winter-blue)', fontSize: '1rem' }}>Nội Dung:</strong>
                   <p style={{ whiteSpace: 'pre-wrap', color: '#1a1a1a', fontWeight: 500, marginTop: '0.5rem' }}>{selectedContact.message}</p>
                 </div>
                 {selectedContact.image_url && (
                   <div className="mb-3">
-                    <strong style={{ color: '#d97706', fontSize: '1rem' }}>Ảnh Đính Kèm:</strong>
+                    <strong style={{ color: 'var(--winter-blue)', fontSize: '1rem' }}>Ảnh Đính Kèm:</strong>
                     <div className="mt-2" style={{ textAlign: 'center' }}>
                       <img 
                         src={selectedContact.image_url} 
@@ -1055,7 +1057,7 @@ const Admin = () => {
                           height: 'auto',
                           objectFit: 'contain',
                           borderRadius: '8px',
-                          border: '2px solid #d97706',
+                          border: '2px solid var(--winter-blue)',
                           backgroundColor: '#f9fafb',
                           display: 'block',
                           margin: '0 auto'
@@ -1074,7 +1076,7 @@ const Admin = () => {
                         style={{ 
                           display: 'inline-block',
                           marginTop: '0.5rem',
-                          color: '#d97706',
+                          color: 'var(--winter-blue)',
                           textDecoration: 'underline',
                           fontSize: '0.875rem'
                         }}
@@ -1085,14 +1087,14 @@ const Admin = () => {
                   </div>
                 )}
                 <div className="mb-3">
-                  <strong style={{ color: '#d97706', fontSize: '1rem' }}>Ngày Gửi:</strong>
+                  <strong style={{ color: 'var(--winter-blue)', fontSize: '1rem' }}>Ngày Gửi:</strong>
                   <p style={{ color: '#1a1a1a', fontWeight: 500, marginTop: '0.5rem' }}>{new Date(selectedContact.created_at).toLocaleString('vi-VN')}</p>
                 </div>
               </div>
-              <div className="modal-footer" style={{ borderTop: '1px solid rgba(217, 119, 6, 0.3)' }}>
+              <div className="modal-footer" style={{ borderTop: '1px solid rgba(14, 165, 233, 0.3)' }}>
                 <motion.button
                   type="button"
-                  className="tet-button-outline"
+                  className="winter-button-outline"
                   onClick={() => {
                     setShowContactModal(false);
                     setSelectedContact(null);

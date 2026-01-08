@@ -79,21 +79,21 @@ const Home = () => {
               />
             </motion.div>
           </AnimatePresence>
-          
-          <button 
-            className="carousel-btn carousel-btn-prev"
-            onClick={() => setCurrentSlide((prev) => (prev - 1 + carouselImages.length) % carouselImages.length)}
-          >
-            <BiChevronLeft size={30} />
-          </button>
-          
-          <button 
-            className="carousel-btn carousel-btn-next"
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % carouselImages.length)}
-          >
-            <BiChevronRight size={30} />
-          </button>
         </div>
+        
+        <button 
+          className="carousel-btn carousel-btn-prev"
+          onClick={() => setCurrentSlide((prev) => (prev - 1 + carouselImages.length) % carouselImages.length)}
+        >
+          <BiChevronLeft size={30} />
+        </button>
+        
+        <button 
+          className="carousel-btn carousel-btn-next"
+          onClick={() => setCurrentSlide((prev) => (prev + 1) % carouselImages.length)}
+        >
+          <BiChevronRight size={30} />
+        </button>
       </section>
 
       <div className="container my-5">
@@ -128,7 +128,7 @@ const Home = () => {
                       <Icon size={60} style={{ color: 'var(--winter-blue)', marginBottom: '1rem' }} />
                     </motion.div>
                     <h4 style={{ color: 'var(--winter-blue-dark)', marginBottom: '1rem', fontWeight: 700 }}>{feature.title}</h4>
-                    <p style={{ color: 'var(--winter-text-light)' }}>{feature.description}</p>
+                    <p style={{ color: 'var(--winter-text)' }}>{feature.description}</p>
                   </div>
                 </motion.div>
               );
@@ -175,7 +175,7 @@ const Home = () => {
                       {post.description}
                     </p>
                     <div className="mt-auto">
-                      <Link to={`/news/${post.id}`} className="tet-button w-100 text-center">
+                      <Link to={`/news/${post.id}`} className="winter-button w-100 text-center">
                         Đọc Thêm
                       </Link>
                     </div>
@@ -188,7 +188,7 @@ const Home = () => {
             className="text-center mt-4"
             variants={itemVariants}
           >
-            <Link to="/news" className="tet-button-outline">
+            <Link to="/news" className="winter-button-outline">
               Xem Tất Cả Tin Tức
             </Link>
           </motion.div>
@@ -214,7 +214,7 @@ const Home = () => {
                       style={{ 
                         fontSize: '1rem', 
                         padding: '0.5rem 1rem',
-                        background: serverStatus.status === 'Online' ? 'var(--winter-blue)' : 'var(--winter-cyan)',
+                        background: serverStatus.status === 'Online' ? 'var(--winter-blue)' : 'var(--winter-gray)',
                         color: '#ffffff',
                         fontWeight: 700
                       }}

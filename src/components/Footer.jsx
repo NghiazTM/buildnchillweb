@@ -36,14 +36,23 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
-                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    whileHover={{ scale: 1.2, rotate: 10 }}
                     whileTap={{ scale: 0.9 }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    style={{ backgroundColor: '#5865F2', color: 'white', padding: '10px', borderRadius: '50%', display: 'inline-flex' }}
+                    style={{ 
+                      background: 'linear-gradient(135deg, #5865F2 0%, #7289DA 100%)',
+                      color: 'white', 
+                      padding: '8px', 
+                      borderRadius: '50%', 
+                      display: 'inline-flex',
+                      border: '3px solid var(--winter-blue)',
+                      boxShadow: '0 0 20px rgba(88, 101, 242, 0.6), 0 0 10px rgba(14, 165, 233, 0.4)',
+                      transition: 'all 0.3s ease'
+                    }}
                   >
-                    <Icon size={20} />
+                    <Icon size={24} />
                   </motion.a>
                 );
               })}
@@ -70,31 +79,57 @@ const Footer = () => {
             </ul>
           </div>
           <div className="col-lg-3 col-md-6 mb-4">
-            <h5>Thông Tin Server</h5>
+            <h5 style={{ color: 'var(--winter-blue)', textShadow: '0 0 10px rgba(14, 165, 233, 0.4)' }}>Thông Tin Server</h5>
             <ul className="list-unstyled">
-              <li className="mb-2" style={{ color: 'var(--text-secondary)' }}>
-                <strong style={{ color: 'var(--winter-blue-dark)' }}>IP:</strong> {siteSettings?.server_ip || 'play.buildnchill.com'}
+              <li className="mb-2">
+                <strong style={{ color: 'var(--winter-blue)', fontSize: '1rem' }}>IP:</strong>
+                <span style={{ 
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: '0.95rem',
+                  fontWeight: '700',
+                  color: 'var(--winter-blue-dark)',
+                  textShadow: '0 0 5px rgba(14, 165, 233, 0.2)',
+                  marginLeft: '0.5rem'
+                }}>{siteSettings?.server_ip || 'play.buildnchill.com'}</span>
               </li>
-              <li className="mb-2" style={{ color: 'var(--text-secondary)' }}>
-                <strong style={{ color: '#d97706' }}>Phiên Bản:</strong> {serverStatus?.version || siteSettings?.server_version || '1.20.4'}
+              <li className="mb-2">
+                <strong style={{ color: 'var(--winter-blue)' }}>Phiên Bản:</strong>
+                <span style={{ marginLeft: '0.5rem', fontWeight: '700', color: 'var(--winter-blue-dark)' }}>
+                  {serverStatus?.version || siteSettings?.server_version || '1.20.4'}
+                </span>
               </li>
-              <li className="mb-2" style={{ color: 'var(--text-secondary)' }}>
-                <strong style={{ color: '#d97706' }}>Trạng Thái:</strong> {serverStatus?.status === 'Online' ? <span className="text-success fw-bold">Đang Hoạt Động</span> : <span className="text-danger">Bảo Trì</span>}
+              <li className="mb-2">
+                <strong style={{ color: 'var(--winter-blue)' }}>Trạng Thái:</strong>
+                <span style={{ marginLeft: '0.5rem', fontWeight: '700', color: serverStatus?.status === 'Online' ? '#10b981' : '#ef4444' }}>
+                  {serverStatus?.status === 'Online' ? '🟢 Đang Hoạt Động' : '🔴 Bảo Trì'}
+                </span>
               </li>
             </ul>
           </div>
           <div className="col-lg-3 col-md-6 mb-4">
-            <h5>Liên Hệ</h5>
+            <h5 style={{ color: 'var(--winter-blue)', textShadow: '0 0 10px rgba(14, 165, 233, 0.4)' }}>Liên Hệ</h5>
             <ul className="list-unstyled">
-              <li className="mb-2" style={{ color: 'var(--text-secondary)' }}>
-                <strong style={{ color: '#d97706' }}>Email:</strong><br />
-                <a href={`mailto:${siteSettings?.contact_email || 'contact@buildnchill.com'}`} style={{ color: 'var(--text-secondary)' }}>
+              <li className="mb-2">
+                <strong style={{ color: 'var(--winter-blue)' }}>Email:</strong><br />
+                <a href={`mailto:${siteSettings?.contact_email || 'contact@buildnchill.com'}`} style={{ 
+                  color: 'var(--winter-blue-dark)',
+                  textDecoration: 'none',
+                  fontWeight: '700',
+                  fontSize: '0.9rem',
+                  textShadow: '0 0 5px rgba(14, 165, 233, 0.2)'
+                }}>
                   {siteSettings?.contact_email || 'contact@buildnchill.com'}
                 </a>
               </li>
-              <li className="mb-2" style={{ color: 'var(--text-secondary)' }}>
-                <strong style={{ color: '#d97706' }}>Số Điện Thoại:</strong><br />
-                <a href={`tel:${siteSettings?.contact_phone?.replace(/\s/g, '') || '+1234567890'}`} style={{ color: 'var(--text-secondary)' }}>
+              <li className="mb-2">
+                <strong style={{ color: 'var(--winter-blue)' }}>Số Điện Thoại:</strong><br />
+                <a href={`tel:${siteSettings?.contact_phone?.replace(/\s/g, '') || '+1234567890'}`} style={{ 
+                  color: 'var(--winter-blue-dark)',
+                  textDecoration: 'none',
+                  fontWeight: '700',
+                  fontSize: '0.9rem',
+                  textShadow: '0 0 5px rgba(14, 165, 233, 0.2)'
+                }}>
                   {siteSettings?.contact_phone || '+1 (234) 567-890'}
                 </a>
               </li>
@@ -102,20 +137,26 @@ const Footer = () => {
           </div>
         </div>
         
-        <hr style={{ borderColor: 'var(--winter-blue)', margin: '2rem 0', borderWidth: '1px', opacity: 0.3 }} />
+        <hr style={{ borderColor: 'var(--winter-blue)', margin: '2rem 0', borderWidth: '1px', opacity: 0.2 }} />
         
         <div className="text-center">
-          <p className="mb-2" style={{ color: '#1f2937', fontSize: '1rem', fontWeight: '600' }}>
+          <p className="mb-2" style={{ 
+            color: 'var(--winter-blue-dark)', 
+            fontSize: '1.1rem', 
+            fontWeight: '700',
+            textShadow: '0 0 10px rgba(14, 165, 233, 0.2)',
+            letterSpacing: '1px'
+          }}>
             &copy; {new Date().getFullYear()} {siteSettings?.site_title || 'BuildnChill'}. All rights reserved. 
-            <span style={{ color: 'var(--winter-blue)', marginLeft: '0.5rem' }}>❄️ Mùa Đông Tuyệt Vời! ❄️</span>
+            <span style={{ color: 'var(--winter-blue)', marginLeft: '0.5rem', textShadow: '0 0 15px rgba(14, 165, 233, 0.4)' }}>❄️ Chúc bạn một mùa đông ấm áp! ❄️</span>
           </p>
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            style={{ fontSize: '0.9rem', color: '#4b5563' }}
+            style={{ fontSize: '0.95rem', color: 'var(--winter-blue-dark)', fontWeight: '600' }}
           >
-            Website được thiết kế và quản lý bởi <span style={{ color: 'var(--winter-blue)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>T-Dev29</span>
+            Website được thiết kế và quản lý bởi <span style={{ color: 'var(--winter-blue)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '2px', textShadow: '0 0 10px rgba(14, 165, 233, 0.3)' }}>T-Dev29</span>
           </motion.div>
         </div>
       </div>

@@ -100,13 +100,13 @@ const ShopCategoriesManagement = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1 className="winter-section-title" style={{ margin: 0 }}>Quản Lý Danh Mục</h1>
         <motion.button
-          className="tet-button"
+          className="winter-button"
           onClick={handleAddNew}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           <BiPlus className="me-2" />
-          Thêm Danh Mục
+          Thêm
         </motion.button>
       </div>
 
@@ -136,7 +136,7 @@ const ShopCategoriesManagement = () => {
                 </td>
                 <td>
                   <motion.button
-                    className="tet-button-outline me-2"
+                    className="winter-button-outline me-2"
                     onClick={() => handleEdit(category)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -144,7 +144,7 @@ const ShopCategoriesManagement = () => {
                     <BiEdit />
                   </motion.button>
                   <motion.button
-                    className="tet-button-outline"
+                    className="winter-button-outline"
                     onClick={() => handleDelete(category.id)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -191,7 +191,7 @@ const ShopCategoriesManagement = () => {
                   <BiCheck className="me-2" />
                   Lưu
                 </motion.button>
-                <motion.button type="button" className="tet-button-outline" onClick={() => setShowModal(false)} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.button type="button" className="winter-button-outline" onClick={() => setShowModal(false)} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <BiX className="me-2" />
                   Hủy
                 </motion.button>
