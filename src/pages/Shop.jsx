@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BiShoppingBag, BiUser, BiCheckCircle, BiXCircle, BiGift, BiQrScan, BiCreditCard, BiStar } from 'react-icons/bi';
+import { BiShoppingBag, BiUser, BiCheckCircle, BiXCircle, BiGift, BiCreditCard, BiStar } from 'react-icons/bi';
 import { supabase } from '../supabaseClient';
 import SnowEffect from '../components/SnowEffect';
 import '../styles/shop-winter.css';
-import { QRCodeCanvas } from 'qrcode.react';
+// import { QRCodeCanvas } from 'qrcode.react'; // Bạn chưa dùng component này, có thể comment lại để tránh warning
 
 const Shop = () => {
   const [categories, setCategories] = useState([]);
@@ -28,7 +28,7 @@ const Shop = () => {
     bank_name: '',
     account_name: ''
   });
-  const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1458351729023254529/TldcZM4HKMyELK9ZICAO8WXQDcG6vqCtYeSXJZ7NqXRWf1fZP_MRAjfjfkx-qgOrLJgS'; // Thay bằng URL thật của bạn
+  const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1458351729023254529/TldcZM4HKMyELK9ZICAO8WXQDcG6vqCtYeSXJZ7NqXRWf1fZP_MRAjfjfkx-qgOrLJgS'; 
 
   const sendDiscordNotification = async (order, customTitle) => {
     if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.includes('Thay bằng URL thật')) return null;
@@ -38,7 +38,7 @@ const Shop = () => {
       const embed = {
         title: `🛒 ${customTitle || 'ĐƠN HÀNG MỚI'}`,
         description: `🔔 <@741299302495813662> ${isSuccess ? 'Người chơi đã xác nhận đã thanh toán xong! Admin vui lòng kiểm tra ngân hàng.' : 'Có một đơn hàng mới vừa được khởi tạo trên hệ thống!'}`,
-        color: 16766720, // Luôn để màu Vàng (Gold) khi khách mới đặt/thanh toán
+        color: 16766720,
         fields: [
           { name: '👤 Người chơi', value: order.mc_username || 'Không rõ', inline: true },
           { name: '📦 Sản phẩm', value: order.product || 'Không rõ', inline: true },
@@ -71,7 +71,6 @@ const Shop = () => {
     }
   };
 
-  // Load categories và products
   useEffect(() => {
     loadCategories();
     loadProducts();
@@ -109,9 +108,8 @@ const Shop = () => {
   };
 
   const loadPaymentInfo = async () => {
-    // Cập nhật thông tin ngân hàng MBBank
     setPaymentInfo({
-      qr_code: '', // Sẽ được tạo động trong modal
+      qr_code: '',
       bank_account: '0379981206',
       bank_name: 'MBBank',
       account_name: 'LE DUC TRONG'
@@ -132,7 +130,6 @@ const Shop = () => {
     setSelectedProduct(product);
     setFormData({ ...formData, product_id: product.id });
     
-    // Tự động cuộn xuống phần điền thông tin
     setTimeout(() => {
       formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
@@ -148,6 +145,7 @@ const Shop = () => {
     }
   };
 
+  // --- PHẦN ĐÃ SỬA LỖI Ở ĐÂY ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -175,25 +173,26 @@ const Shop = () => {
       // Tạo order với status='pending' (chưa thanh toán)
       const tempId = crypto.randomUUID();
       const newOrder = {
-            id: tempId,
-            mc_username: formData.mc_username.trim(),
-            product: product.name,
-            product_id: product.id,
-            category_id: product.category_id,
-            command: product.command.replace('{username}', formData.mc_username.trim()),
-            price: product.price,
-            status: 'pending',
-            delivered: false,
-            payment_method: formData.payment_method
-          };
-        localStorage.setItem('last_mc_username', formData.mc_username.trim());
-        setCurrentOrder(newOrder);
-        setShowPayment(true);
-        setMessage({ 
-          type: 'success', 
-          text: 'Vui lòng hoàn tất thanh toán trong bảng hiện ra!' 
-        });
-      }
+        id: tempId,
+        mc_username: formData.mc_username.trim(),
+        product: product.name,
+        product_id: product.id,
+        category_id: product.category_id,
+        command: product.command.replace('{username}', formData.mc_username.trim()),
+        price: product.price,
+        status: 'pending',
+        delivered: false,
+        payment_method: formData.payment_method
+      };
+
+      localStorage.setItem('last_mc_username', formData.mc_username.trim());
+      setCurrentOrder(newOrder);
+      setShowPayment(true);
+      setMessage({ 
+        type: 'success', 
+        text: 'Vui lòng hoàn tất thanh toán trong bảng hiện ra!' 
+      });
+      
     } catch (error) {
       console.error('Unexpected error:', error);
       setMessage({ 
@@ -204,13 +203,13 @@ const Shop = () => {
       setSubmitting(false);
     }
   };
+  // -----------------------------
 
   const handlePaymentComplete = async () => {
     if (!currentOrder || submitting) return;
     
     setSubmitting(true);
     try {
-      // 1. Chỉ lưu đơn hàng vào database KHI người dùng bấm xác nhận đã thanh toán
       const { data, error } = await supabase
         .from('orders')
         .insert([
@@ -233,10 +232,8 @@ const Shop = () => {
 
       if (error) throw error;
 
-      // 2. Gửi thông báo Discord
       const messageId = await sendDiscordNotification(data, 'THANH TOÁN THÀNH CÔNG');
       
-      // 3. Cập nhật messageId vào notes nếu có
       if (messageId) {
         await supabase
           .from('orders')
@@ -245,11 +242,13 @@ const Shop = () => {
           })
           .eq('id', data.id);
       }
-    setShowPayment(false);
-    setShowSuccess(true);
-    setFormData({ mc_username: '', product_id: '', payment_method: 'qr' });
-    setSelectedProduct(null);
+
+      setShowPayment(false);
+      setShowSuccess(true);
+      setFormData({ mc_username: '', product_id: '', payment_method: 'qr' });
+      setSelectedProduct(null);
       setCurrentOrder(null);
+      
     } catch (error) {
       console.error('Error completing payment:', error);
       alert('Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại hoặc liên hệ Admin!');
@@ -304,7 +303,6 @@ const Shop = () => {
             ❄️ Mua sắm mùa đông, rước lộc đầy kho! ❄️
           </motion.p>
 
-          {/* Payment Modal */}
           <AnimatePresence>
             {showPayment && currentOrder && (
               <motion.div
@@ -385,7 +383,7 @@ const Shop = () => {
               </motion.div>
             )}
           </AnimatePresence>
-          {/* Success Modal */}
+          
           <AnimatePresence>
             {showSuccess && (
               <motion.div
@@ -432,7 +430,6 @@ const Shop = () => {
             )}
           </AnimatePresence>
           <div className="row">
-            {/* Sidebar Categories */}
             <motion.div 
               className="col-lg-3 mb-4"
               variants={itemVariants}
@@ -479,7 +476,6 @@ const Shop = () => {
               </div>
             </motion.div>
 
-            {/* Products Grid */}
             <motion.div 
               className="col-lg-9"
               variants={containerVariants}
@@ -543,7 +539,6 @@ const Shop = () => {
             </motion.div>
           </div>
 
-          {/* Order Form */}
           {selectedProduct && (
             <motion.div 
               ref={formRef}
