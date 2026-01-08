@@ -133,8 +133,6 @@ export const DataProvider = ({ children }) => {
       await loadServerStatus();
     } catch (error) {
       console.error('Error loading data:', error);
-      setNews(mockData.news);
-      setServerStatus(mockData.serverStatus);
     } finally {
       setLoading(false);
     }
@@ -149,7 +147,7 @@ export const DataProvider = ({ children }) => {
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
+      if (data) {
         const formattedNews = data.map(item => ({
           id: item.id,
           title: item.title,
@@ -160,11 +158,11 @@ export const DataProvider = ({ children }) => {
         }));
         setNews(formattedNews);
       } else {
-        setNews(mockData.news);
+        setNews([]);
       }
     } catch (error) {
       console.error('Error loading news:', error);
-      setNews(mockData.news);
+      setNews([]);
     }
   };
   const fetchMinecraftServerStatus = async (serverIp) => {
