@@ -14,7 +14,7 @@ const Home = () => {
   const latestNews = news.slice(0, 3);
 
   const carouselImages = [
-    'https://foodtek.vn/sites/default/files/2025-12/1766978938677.webp',
+    'https://foodtek.vn/sites/default/files/2026-01/PC.webp',
     'https://foodtek.vn/sites/default/files/2025-12/462570011_607189315167864_5786208777291669050_n.webp',
     'https://foodtek.vn/sites/default/files/2025-12/467459402_525799813831572_2048064753693338637_n.webp',
     'https://foodtek.vn/sites/default/files/2025-12/467457844_1958845277932349_4464426894527163495_n.webp',
