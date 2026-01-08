@@ -173,10 +173,9 @@ const Shop = () => {
       }
 
       // Tạo order với status='pending' (chưa thanh toán)
-      const { data, error } = await supabase
-        .from('orders')
-        .insert([
-          {
+      const tempId = crypto.randomUUID();
+      const newOrder = {
+            id: tempId,
             mc_username: formData.mc_username.trim(),
             product: product.name,
             product_id: product.id,
@@ -186,24 +185,13 @@ const Shop = () => {
             status: 'pending',
             delivered: false,
             payment_method: formData.payment_method
-          }
-        ])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating order:', error);
-        setMessage({ 
-          type: 'error', 
-          text: `Lỗi: ${error.message || 'Không thể tạo đơn hàng. Vui lòng thử lại!'}` 
-        });
-      } else {
+          };
         localStorage.setItem('last_mc_username', formData.mc_username.trim());
-        setCurrentOrder(data);
+        setCurrentOrder(newOrder);
         setShowPayment(true);
         setMessage({ 
           type: 'success', 
-          text: 'Đơn hàng đã được tạo! Vui lòng thanh toán để nhận sản phẩm.' 
+          text: 'Vui lòng hoàn tất thanh toán trong bảng hiện ra!' 
         });
       }
     } catch (error) {
@@ -218,26 +206,56 @@ const Shop = () => {
   };
 
   const handlePaymentComplete = async () => {
-    if (currentOrder) {
-      // Gửi thông báo cho admin và lấy message ID
-      const messageId = await sendDiscordNotification(currentOrder, 'THANH TOÁN THÀNH CÔNG');
+    if (!currentOrder || submitting) return;
+    
+    setSubmitting(true);
+    try {
+      // 1. Chỉ lưu đơn hàng vào database KHI người dùng bấm xác nhận đã thanh toán
+      const { data, error } = await supabase
+        .from('orders')
+        .insert([
+          {
+            id: currentOrder.id,
+            mc_username: currentOrder.mc_username,
+            product: currentOrder.product,
+            product_id: currentOrder.product_id,
+            category_id: currentOrder.category_id,
+            command: currentOrder.command,
+            price: currentOrder.price,
+            status: 'pending',
+            delivered: false,
+            payment_method: currentOrder.payment_method,
+            notes: 'Người chơi đã bấm nút "Đã Thanh Toán" trên web'
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // 2. Gửi thông báo Discord
+      const messageId = await sendDiscordNotification(data, 'THANH TOÁN THÀNH CÔNG');
       
-      // Cập nhật ghi chú trong database để admin biết người chơi đã xác nhận
-      try {
+      // 3. Cập nhật messageId vào notes nếu có
+      if (messageId) {
         await supabase
           .from('orders')
           .update({ 
-            notes: `Người chơi đã bấm nút "Đã Thanh Toán" trên web${messageId ? ` [msg_id:${messageId}]` : ''}`
+            notes: `Người chơi đã bấm nút "Đã Thanh Toán" trên web [msg_id:${messageId}]`
           })
-          .eq('id', currentOrder.id);
-      } catch (err) {
-        console.error('Error updating order notes:', err);
+          .eq('id', data.id);
       }
-    }
     setShowPayment(false);
     setShowSuccess(true);
     setFormData({ mc_username: '', product_id: '', payment_method: 'qr' });
     setSelectedProduct(null);
+      setCurrentOrder(null);
+    } catch (error) {
+      console.error('Error completing payment:', error);
+      alert('Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại hoặc liên hệ Admin!');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const containerVariants = {
@@ -348,10 +366,11 @@ const Shop = () => {
                     <motion.button
                       className="winter-button"
                       onClick={handlePaymentComplete}
+                      disabled={submitting}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Đã Thanh Toán
+                      {submitting ? 'Đang Xử Lý...' : 'Đã Thanh Toán'}
                     </motion.button>
                     <motion.button
                       className="winter-button-outline"
