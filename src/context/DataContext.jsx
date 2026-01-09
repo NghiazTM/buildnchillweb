@@ -590,6 +590,67 @@ export const DataProvider = ({ children }) => {
       return null;
     }
   };
+  const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1458351729023254529/TldcZM4HKMyELK9ZICAO8WXQDcG6vqCtYeSXJZ7NqXRWf1fZP_MRAjfjfkx-qgOrLJgS';
+
+  const getContactEmbed = (contact, status = 'pending') => {
+      const categoryLabel = {
+        'report': 'Báo Cáo (Report)',
+        'help': 'Trợ Giúp (Help)',
+        'bug': 'Báo Lỗi (Bug)',
+        'suggestion': 'Đề Xuất (Suggestion)',
+        'other': 'Khác (Other)'
+      }[contact.category] || contact.category;
+    const statusInfo = {
+      'pending': { label: '⏳ Chờ Xử Lý', color: 16766720 }, // Yellow
+      'processing': { label: '⚙️ Đã Nhận (Đang Xử Lý)', color: 0 }, // Black/Dark
+      'resolved': { label: '✅ Đã Giải Quyết', color: 3066993 } // Green
+    }[status] || { label: '⏳ Chờ Xử Lý', color: 16766720 };
+
+      const embed = {
+        title: `${statusInfo.label} | LIÊN HỆ: ${contact.subject}`,
+      description: `🔔 **Yêu cầu hỗ trợ từ Website**`,
+      color: statusInfo.color,
+        fields: [
+          { name: '👤 Người chơi', value: contact.ign || 'Không rõ', inline: true },
+          { name: '🏷️ Danh mục', value: categoryLabel || 'Khác', inline: true },
+          { name: '📧 Email', value: contact.email || 'N/A', inline: true },
+          { name: '📞 Điện thoại', value: contact.phone || 'N/A', inline: true },
+          { name: '💬 Tin nhắn', value: contact.message || 'N/A' }
+        ],
+        footer: { text: 'BuildnChill Support System' },
+        timestamp: contact.created_at || new Date().toISOString()
+      };
+
+      if (contact.image_url) {
+        embed.image = { url: contact.image_url };
+      }
+      return embed;
+  };
+
+  const sendDiscordContactNotification = async (contact) => {
+    if (!DISCORD_WEBHOOK_URL) return null;
+
+    try {
+      const embed = getContactEmbed(contact, 'pending');
+
+      const response = await fetch(`${DISCORD_WEBHOOK_URL}?wait=true`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: `🔔 <@741299302495813662> **CÓ LIÊN HỆ MỚI!**`,
+          embeds: [embed]
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.id; // Trả về message ID của Discord
+      }
+      return null;
+    } catch (error) {
+      console.error('Error sending Discord contact notification:', error);
+      return null;
+    }
+  };
 
   const submitContact = async (contactData) => {
     try {
@@ -616,7 +677,15 @@ export const DataProvider = ({ children }) => {
         .single();
 
       if (error) throw error;
-
+      const discordMsgId = await sendDiscordContactNotification(data);
+      
+      if (discordMsgId) {
+        // Cập nhật lại contact với Discord Message ID
+        await supabase
+          .from('contacts')
+          .update({ discord_message_id: discordMsgId })
+          .eq('id', data.id);
+      }
       if (isAuthenticated) {
         loadContacts();
       }
@@ -651,6 +720,7 @@ export const DataProvider = ({ children }) => {
 
   const updateContactStatus = async (contactId, status) => {
     try {
+      const currentContact = contacts.find(c => c.id === contactId);
       const { error } = await supabase
         .from('contacts')
         .update({ status: status })
@@ -661,6 +731,28 @@ export const DataProvider = ({ children }) => {
       setContacts(prev => prev.map(contact =>
         contact.id === contactId ? { ...contact, status: status } : contact
       ));
+      if (currentContact?.discord_message_id) {
+        try {
+          if (status === 'resolved') {
+            // Xóa tin nhắn nếu đã giải quyết
+            await fetch(`${DISCORD_WEBHOOK_URL}/messages/${currentContact.discord_message_id}`, {
+              method: 'DELETE'
+            });
+          } else {
+            // Cập nhật màu sắc tin nhắn (Edit)
+            const updatedEmbed = getContactEmbed(currentContact, status);
+            await fetch(`${DISCORD_WEBHOOK_URL}/messages/${currentContact.discord_message_id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                embeds: [updatedEmbed]
+              })
+            });
+          }
+        } catch (discordError) {
+          console.error('Error syncing Discord status:', discordError);
+        }
+      }
 
       return true;
     } catch (error) {
