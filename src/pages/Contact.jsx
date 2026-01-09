@@ -12,7 +12,6 @@ const Contact = () => {
     email: '',
     phone: '',
     category: '',
-    subject: '',
     message: '',
     image: null
   });
@@ -83,7 +82,6 @@ const Contact = () => {
           email: '',
           phone: '',
           category: '',
-          subject: '',
           message: '',
           image: null
         });
@@ -187,28 +185,6 @@ const Contact = () => {
                   <option key={cat.value} value={cat.value}>{cat.label}</option>
                 ))}
               </select>
-            </motion.div>
-
-            <motion.div 
-              className="mb-4"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <label htmlFor="subject" className="form-label">
-                <BiMessageSquare className="me-2" style={{ color: 'var(--winter-blue)' }} />
-                Chủ Đề
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                placeholder="Nhập chủ đề của bạn..."
-                required
-              />
             </motion.div>
 
             <motion.div 
