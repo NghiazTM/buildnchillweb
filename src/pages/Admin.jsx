@@ -176,9 +176,9 @@ const Admin = () => {
   }, [isAuthenticated]);
 
   const statusOptions = [
-    { value: 'pending', label: 'Chưa Giải Quyết', color: 'var(--winter-blue)' },
-    { value: 'received', label: 'Đã Nhận', color: '#3b82f6' },
-    { value: 'resolved', label: 'Đã Giải Quyết', color: '#10b981' }
+    { value: 'pending', label: '🔴 Đã Nhận', color: '#ef4444' },
+    { value: 'processing', label: '🟡 Đang Kiểm Tra', color: '#f59e0b' },
+    { value: 'resolved', label: '🟢 Đã Giải Quyết', color: '#10b981' }
   ];
 
   const categoryLabels = {
@@ -215,6 +215,7 @@ const Admin = () => {
   // Notification for new contacts
   const unreadCount = contacts.filter(c => !c.read).length;
   const pendingCount = contacts.filter(c => c.status === 'pending' || !c.status).length;
+  const processingCount = contacts.filter(c => c.status === 'processing').length;
 
   const handleInputChange = (e) => {
     setFormData({
@@ -352,7 +353,7 @@ const Admin = () => {
         <nav className="admin-top-nav-menu">
           {tabs.map((tab) => {
             const Icon = tab.icon;
-            const hasNotification = tab.id === 'contacts' && (unreadCount > 0 || pendingCount > 0);
+            const hasNotification = tab.id === 'contacts' && (unreadCount > 0 || pendingCount > 0 || processingCount > 0);
             return (
               <motion.button
                 key={tab.id}
@@ -380,7 +381,7 @@ const Admin = () => {
                     fontSize: '0.7rem',
                     fontWeight: 'bold'
                   }}>
-                    {unreadCount + pendingCount > 9 ? '9+' : unreadCount + pendingCount}
+                    {unreadCount + pendingCount + processingCount > 9 ? '9+' : unreadCount + pendingCount + processingCount}
                   </span>
                 )}
               </motion.button>
@@ -421,7 +422,7 @@ const Admin = () => {
           <nav className="nav flex-column">
             {tabs.map((tab) => {
               const Icon = tab.icon;
-              const hasNotification = tab.id === 'contacts' && (unreadCount > 0 || pendingCount > 0);
+              const hasNotification = tab.id === 'contacts' && (unreadCount > 0 || pendingCount > 0 || processingCount > 0);
               return (
                 <motion.button
                   key={tab.id}
@@ -449,7 +450,7 @@ const Admin = () => {
                       fontSize: '0.75rem',
                       fontWeight: 'bold'
                     }}>
-                      {unreadCount + pendingCount > 9 ? '9+' : unreadCount + pendingCount}
+                      {unreadCount + pendingCount + processingCount > 9 ? '9+' : unreadCount + pendingCount + processingCount}
                     </span>
                   )}
                 </motion.button>
@@ -603,12 +604,16 @@ const Admin = () => {
                         <span className="badge bg-primary rounded-pill">{news.length}</span>
                       </li>
                       <li className="mb-3 d-flex justify-content-between align-items-center p-2 rounded" style={{ background: 'rgba(255,255,255,0.5)' }}>
-                        <span style={{ fontWeight: 500 }}>Liên hệ mới</span>
-                        <span className="badge bg-danger rounded-pill">{contacts.filter(c => !c.read).length}</span>
+                        <span style={{ fontWeight: 500 }}>Liên hệ chưa đọc</span>
+                        <span className="badge bg-danger rounded-pill">{unreadCount}</span>
                       </li>
                       <li className="mb-3 d-flex justify-content-between align-items-center p-2 rounded" style={{ background: 'rgba(255,255,255,0.5)' }}>
                         <span style={{ fontWeight: 500 }}>Liên hệ chờ xử lý</span>
-                        <span className="badge bg-warning rounded-pill">{contacts.filter(c => c.status === 'pending' || !c.status).length}</span>
+                        <span className="badge bg-warning rounded-pill">{pendingCount}</span>
+                      </li>
+                      <li className="mb-3 d-flex justify-content-between align-items-center p-2 rounded" style={{ background: 'rgba(255,255,255,0.5)' }}>
+                        <span style={{ fontWeight: 500 }}>Liên hệ đang kiểm tra</span>
+                        <span className="badge bg-info rounded-pill">{processingCount}</span>
                       </li>
                     </ul>
                   </div>
@@ -714,8 +719,9 @@ const Admin = () => {
                 <div style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>
                   <span style={{ color: '#0a0a0a', fontWeight: 600 }}>
                     Tổng: {contacts.length} | 
-                    Chưa đọc: {contacts.filter(c => !c.read).length} | 
-                    Chưa giải quyết: {contacts.filter(c => c.status === 'pending' || !c.status).length}
+                    Chưa đọc: {unreadCount} | 
+                    Đã nhận: {pendingCount} | 
+                    Đang kiểm tra: {processingCount}
                   </span>
                 </div>
               </div>
