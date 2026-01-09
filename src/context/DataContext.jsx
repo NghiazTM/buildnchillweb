@@ -3,7 +3,13 @@ import { supabase } from '../supabaseClient';
 import mockData from '../data/mockData.json';
 
 const DataContext = createContext();
-
+const categoryLabels = {
+  'report': 'Báo Cáo (Report)',
+  'help': 'Trợ Giúp (Help)',
+  'bug': 'Báo Lỗi (Bug)',
+  'suggestion': 'Đề Xuất (Suggestion)',
+  'other': 'Khác (Other)'
+};
 export const useData = () => {
   const context = useContext(DataContext);
   if (!context) {
@@ -595,29 +601,21 @@ export const DataProvider = ({ children }) => {
   const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1459038651513311301/7iMnd_skBCTXmvvAhnZbmUawTGk1QO7Ft1nXimeKkmbBJQQvg7znZPwkbtrupSpmL9tS';
 
   const getContactEmbed = (contact, status = 'pending') => {
-    const categoryLabel = {
-      'report': 'Báo Cáo (Report)',
-      'help': 'Trợ Giúp (Help)',
-      'bug': 'Báo Lỗi (Bug)',
-      'suggestion': 'Đề Xuất (Suggestion)',
-      'other': 'Khác (Other)'
-    }[contact.category] || contact.category;
+    const categoryLabel = categoryLabels[contact.category] || contact.category;
 
     const statusInfo = {
       'pending': { label: '🔴 Đã Nhận (Chờ Xử Lý)', color: 15158332 }, // Red
       'processing': { label: '🟡 Đang Kiểm Tra', color: 16766720 }, // Yellow/Orange
       'resolved': { label: '🟢 Đã Giải Quyết', color: 3066993 } // Green
     }[status] || { label: '🔴 Đã Nhận', color: 15158332 };
-
+    
     const embed = {
-      title: `${statusInfo.label} | LIÊN HỆ: ${contact.subject || 'Không có tiêu đề'}`,
+      title: `${statusInfo.label} | LIÊN HỆ: ${categoryLabel || 'Không rõ'}`,
       description: `🔔 **Yêu cầu hỗ trợ từ Website**`,
       color: statusInfo.color,
       fields: [
         { name: '👤 Người chơi', value: String(contact.ign || 'Không rõ'), inline: true },
         { name: '🏷️ Danh mục', value: String(categoryLabel || 'Khác'), inline: true },
-        { name: '📧 Email', value: String(contact.email || 'N/A'), inline: true },
-        { name: '📞 Điện thoại', value: String(contact.phone || 'N/A'), inline: true },
         { name: '💬 Tin nhắn', value: String(contact.message || 'N/A') }
       ],
       footer: { text: 'BuildnChill Support System' },
@@ -673,7 +671,7 @@ export const DataProvider = ({ children }) => {
           email: contactData.email,
           phone: contactData.phone || null,
           category: contactData.category || 'other',
-          subject: contactData.subject,
+          subject: categoryLabels[contactData.category] || contactData.category || 'Liên Hệ',
           message: contactData.message,
           image_url: imageUrl,
           status: 'pending'
