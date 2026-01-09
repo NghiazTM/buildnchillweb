@@ -733,7 +733,6 @@ const Admin = () => {
                       <th>Tên Game</th>
                       <th>Email</th>
                       <th>Danh Mục</th>
-                      <th>Chủ Đề</th>
                       <th>Ảnh</th>
                       <th>Ngày</th>
                       <th>Trạng Thái</th>
@@ -781,7 +780,6 @@ const Admin = () => {
                                 {categoryLabels[contact.category] || 'Khác'}
                               </span>
                             </td>
-                            <td style={{ wordWrap: 'break-word', maxWidth: '150px', color: '#0a0a0a', fontWeight: 500 }}>{contact.subject}</td>
                             <td style={{ wordWrap: 'break-word' }}>
                               {contact.image_url ? (
                                 <motion.button
@@ -1251,10 +1249,6 @@ const Admin = () => {
                       </span>
                     </p>
                   </div>
-                </div>
-                <div className="mb-3">
-                  <strong style={{ color: 'var(--winter-blue)', fontSize: '1rem' }}>Chủ Đề:</strong>
-                  <p style={{ color: '#1a1a1a', fontWeight: 500, marginTop: '0.5rem' }}>{selectedContact.subject}</p>
                 </div>
                 <div className="mb-3">
                   <strong style={{ color: 'var(--winter-blue)', fontSize: '1rem' }}>Nội Dung:</strong>
