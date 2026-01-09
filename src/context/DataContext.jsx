@@ -133,6 +133,7 @@ export const DataProvider = ({ children }) => {
       await loadServerStatus();
     } catch (error) {
       console.error('Error loading data:', error);
+      // Removed mockData fallbacks to prevent unwanted placeholder content
     } finally {
       setLoading(false);
     }
@@ -590,41 +591,44 @@ export const DataProvider = ({ children }) => {
       return null;
     }
   };
+
   const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1458351729023254529/TldcZM4HKMyELK9ZICAO8WXQDcG6vqCtYeSXJZ7NqXRWf1fZP_MRAjfjfkx-qgOrLJgS';
 
   const getContactEmbed = (contact, status = 'pending') => {
-      const categoryLabel = {
-        'report': 'Báo Cáo (Report)',
-        'help': 'Trợ Giúp (Help)',
-        'bug': 'Báo Lỗi (Bug)',
-        'suggestion': 'Đề Xuất (Suggestion)',
-        'other': 'Khác (Other)'
-      }[contact.category] || contact.category;
+    const categoryLabel = {
+      'report': 'Báo Cáo (Report)',
+      'help': 'Trợ Giúp (Help)',
+      'bug': 'Báo Lỗi (Bug)',
+      'suggestion': 'Đề Xuất (Suggestion)',
+      'other': 'Khác (Other)'
+    }[contact.category] || contact.category;
+
     const statusInfo = {
       'pending': { label: '⏳ Chờ Xử Lý', color: 16766720 }, // Yellow
       'processing': { label: '⚙️ Đã Nhận (Đang Xử Lý)', color: 0 }, // Black/Dark
       'resolved': { label: '✅ Đã Giải Quyết', color: 3066993 } // Green
     }[status] || { label: '⏳ Chờ Xử Lý', color: 16766720 };
 
-      const embed = {
-        title: `${statusInfo.label} | LIÊN HỆ: ${contact.subject}`,
+    const embed = {
+      title: `${statusInfo.label} | LIÊN HỆ: ${contact.subject || 'Không có tiêu đề'}`,
       description: `🔔 **Yêu cầu hỗ trợ từ Website**`,
       color: statusInfo.color,
-        fields: [
-          { name: '👤 Người chơi', value: contact.ign || 'Không rõ', inline: true },
-          { name: '🏷️ Danh mục', value: categoryLabel || 'Khác', inline: true },
-          { name: '📧 Email', value: contact.email || 'N/A', inline: true },
-          { name: '📞 Điện thoại', value: contact.phone || 'N/A', inline: true },
-          { name: '💬 Tin nhắn', value: contact.message || 'N/A' }
-        ],
-        footer: { text: 'BuildnChill Support System' },
-        timestamp: contact.created_at || new Date().toISOString()
-      };
+      fields: [
+        { name: '👤 Người chơi', value: String(contact.ign || 'Không rõ'), inline: true },
+        { name: '🏷️ Danh mục', value: String(categoryLabel || 'Khác'), inline: true },
+        { name: '📧 Email', value: String(contact.email || 'N/A'), inline: true },
+        { name: '📞 Điện thoại', value: String(contact.phone || 'N/A'), inline: true },
+        { name: '💬 Tin nhắn', value: String(contact.message || 'N/A') }
+      ],
+      footer: { text: 'BuildnChill Support System' },
+      timestamp: new Date(contact.created_at || new Date()).toISOString()
+    };
 
-      if (contact.image_url) {
-        embed.image = { url: contact.image_url };
-      }
-      return embed;
+    if (contact.image_url) {
+      embed.image = { url: contact.image_url };
+    }
+
+    return embed;
   };
 
   const sendDiscordContactNotification = async (contact) => {
@@ -641,6 +645,7 @@ export const DataProvider = ({ children }) => {
           embeds: [embed]
         })
       });
+
       if (response.ok) {
         const data = await response.json();
         return data.id; // Trả về message ID của Discord
@@ -671,21 +676,26 @@ export const DataProvider = ({ children }) => {
           subject: contactData.subject,
           message: contactData.message,
           image_url: imageUrl,
-          status: 'pending' // Mặc định là chưa giải quyết
+          status: 'pending'
         }])
         .select()
         .single();
 
       if (error) throw error;
-      const discordMsgId = await sendDiscordContactNotification(data);
-      
-      if (discordMsgId) {
-        // Cập nhật lại contact với Discord Message ID
-        await supabase
-          .from('contacts')
-          .update({ discord_message_id: discordMsgId })
-          .eq('id', data.id);
+
+      // Gửi thông báo Discord và lấy Message ID
+      try {
+        const discordMsgId = await sendDiscordContactNotification(data);
+        if (discordMsgId) {
+          await supabase
+            .from('contacts')
+            .update({ discord_message_id: discordMsgId })
+            .eq('id', data.id);
+        }
+      } catch (discordErr) {
+        console.warn('Discord notification partial failure:', discordErr);
       }
+
       if (isAuthenticated) {
         loadContacts();
       }
@@ -721,6 +731,7 @@ export const DataProvider = ({ children }) => {
   const updateContactStatus = async (contactId, status) => {
     try {
       const currentContact = contacts.find(c => c.id === contactId);
+
       const { error } = await supabase
         .from('contacts')
         .update({ status: status })
@@ -728,9 +739,12 @@ export const DataProvider = ({ children }) => {
 
       if (error) throw error;
 
+      // Update local state
       setContacts(prev => prev.map(contact =>
         contact.id === contactId ? { ...contact, status: status } : contact
       ));
+
+      // Đồng bộ Discord
       if (currentContact?.discord_message_id) {
         try {
           if (status === 'resolved') {
