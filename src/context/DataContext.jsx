@@ -592,7 +592,7 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1458351729023254529/TldcZM4HKMyELK9ZICAO8WXQDcG6vqCtYeSXJZ7NqXRWf1fZP_MRAjfjfkx-qgOrLJgS';
+  const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1459038651513311301/7iMnd_skBCTXmvvAhnZbmUawTGk1QO7Ft1nXimeKkmbBJQQvg7znZPwkbtrupSpmL9tS';
 
   const getContactEmbed = (contact, status = 'pending') => {
     const categoryLabel = {
@@ -604,10 +604,10 @@ export const DataProvider = ({ children }) => {
     }[contact.category] || contact.category;
 
     const statusInfo = {
-      'pending': { label: '⏳ Chờ Xử Lý', color: 16766720 }, // Yellow
-      'processing': { label: '⚙️ Đã Nhận (Đang Xử Lý)', color: 0 }, // Black/Dark
-      'resolved': { label: '✅ Đã Giải Quyết', color: 3066993 } // Green
-    }[status] || { label: '⏳ Chờ Xử Lý', color: 16766720 };
+      'pending': { label: '🔴 Đã Nhận (Chờ Xử Lý)', color: 15158332 }, // Red
+      'processing': { label: '🟡 Đang Kiểm Tra', color: 16766720 }, // Yellow/Orange
+      'resolved': { label: '🟢 Đã Giải Quyết', color: 3066993 } // Green
+    }[status] || { label: '🔴 Đã Nhận', color: 15158332 };
 
     const embed = {
       title: `${statusInfo.label} | LIÊN HỆ: ${contact.subject || 'Không có tiêu đề'}`,
