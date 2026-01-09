@@ -747,22 +747,14 @@ export const DataProvider = ({ children }) => {
       // Đồng bộ Discord
       if (currentContact?.discord_message_id) {
         try {
-          if (status === 'resolved') {
-            // Xóa tin nhắn nếu đã giải quyết
-            await fetch(`${DISCORD_WEBHOOK_URL}/messages/${currentContact.discord_message_id}`, {
-              method: 'DELETE'
-            });
-          } else {
-            // Cập nhật màu sắc tin nhắn (Edit)
-            const updatedEmbed = getContactEmbed(currentContact, status);
-            await fetch(`${DISCORD_WEBHOOK_URL}/messages/${currentContact.discord_message_id}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                embeds: [updatedEmbed]
-              })
-            });
-          }
+         const updatedEmbed = getContactEmbed(currentContact, status);
+        await fetch(`${DISCORD_WEBHOOK_URL}/messages/${currentContact.discord_message_id}`, {
+         method: 'PATCH',
+           headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+           embeds: [updatedEmbed]
+          })
+         });
         } catch (discordError) {
           console.error('Error syncing Discord status:', discordError);
         }
